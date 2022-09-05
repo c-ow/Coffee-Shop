@@ -1,9 +1,10 @@
+from asyncio.windows_events import NULL
 import sqlite3, random, time
 con = sqlite3.connect('SQL w Python/coffee shop.db')
 
 daily_sales = 0
 daily_earning = 0
-currentID = 0
+
 
 def order_maker():
     global currentID
@@ -19,6 +20,7 @@ def order_maker():
     cur.execute (f"insert into orders values ({id}, '{name}', '{coffee}', '{size[0]}', '{food[0]}', {price})")
     print(f"{name} has ordered a {size[0]} {coffee} and a {food[0]}")
     con.commit()
+    return id
 
 def payment(x):
     payment = random.choice(["Cash", "Card"])
@@ -42,17 +44,18 @@ def checkout(id):
 def sim_order():
     delay = random.randint(1,3)
     time.sleep(delay)
-    order_maker()
-def fulfill_order():
+    id = order_maker()
+    return id
+
+def fulfill_order(id):
     delay = random.randint(1,2)
     time.sleep(delay)
-    checkout(currentID)
+    checkout(id)
 
 end_day = time.time() + random.randint(60,90)
 while True:
-    currentID += 1
-    sim_order()
-    fulfill_order()
+    id = sim_order()
+    fulfill_order(id)
     if time.time() > end_day:
         break
 
